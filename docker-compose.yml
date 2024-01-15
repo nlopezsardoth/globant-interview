@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+  globant_interview:
+    container_name: globant_interview
+    image: nlopezsardoth/globant_interview:1.0.0
+    build: .
+    ports:
+      -  "4000:4000"
+    environment:
+      - API_KEY=${API_KEY}
+
