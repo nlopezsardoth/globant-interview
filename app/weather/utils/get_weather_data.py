@@ -1,32 +1,64 @@
 import requests
-from flask import current_app, make_response, jsonify
 
 from .weather_data_transformer import WeatherDataTransformer
 
+from ..exceptions import PositionDataRetrievalError, WeatherDataRetrievalError, PositionDataError
 
+from ..errors import build_error_response
+
+
+def _fetch_position_data(city_name, country, api_key):
+    """Retrieves position data from the API."""
+    try:
+        resp = requests.get(f"http://api.openweathermap.org/data/2.5/weather?q={city_name},{country}&appid={api_key}")
+        resp.raise_for_status()
+        return resp.json()
+    except requests.exceptions.RequestException as e:
+        raise PositionDataRetrievalError(f"Failed to fetch position data: {e.response.text}") from e
+    
+def _get_position(city_name, country, api_key):
+    """Extracts position data from API response."""
+    try:
+        data = _fetch_position_data(city_name, country, api_key)
+        coordinates = data.get("coord")
+        if coordinates:
+            lat, lon = coordinates["lat"], coordinates["lon"]
+            country = data.get("sys")["country"]
+            city = data.get("name")
+            return lat, lon, country, city
+        else:
+            raise PositionDataError("Missing coordinates in API response")
+    except PositionDataRetrievalError as e:
+        raise 
+    except Exception as e:
+        raise PositionDataError("Error processing position data") from e
+    
+def _fetch_weather_data(lat, lon, api_key):
+    """Retrieves weather data from the API."""
+    try:
+        resp = requests.get(f"http://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&appid={api_key}")
+        resp.raise_for_status()
+        return resp.json()
+
+    except requests.exceptions.RequestException as e:
+        raise WeatherDataRetrievalError("Failed to fetch weather data:  {e.response.text}") from e
     
 
-def get_position(city_name, country):
-    API_KEY =  current_app.config["API_KEY"]
+def get_weather_data(city_name, country, api_key):
     try:
-        resp = requests.get(f"http://api.openweathermap.org/data/2.5/weather?q={city_name},{country}&appid={API_KEY}")
-        resp.raise_for_status()
-        data = resp.json()
-        coordinates = data.get("coord")
-        lat, lon, country, city = coordinates["lat"],  coordinates["lon"], data.get("sys")["country"], data.get("name")
-        return lat, lon, country, city
-    except requests.exceptions.RequestException as e:
-        return make_response(jsonify({'error': 'Failed to fetch position data'}), 500)
-
-def get_weather_data(lat, lon, city_name, country):
-    API_KEY =  current_app.config["API_KEY"]
-    try:
-        resp = requests.get(f"http://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&appid={API_KEY}")
-        resp.raise_for_status()
-        weather_data = resp.json()
-        transformer = WeatherDataTransformer(weather_data=weather_data, city=city_name, country=country)
+        lat, lon, country, city = _get_position(city_name, country, api_key)
+        weather_data = _fetch_weather_data(lat, lon, api_key)
+        transformer = WeatherDataTransformer(weather_data=weather_data, city=city, country=country)
         transformed_data = transformer.transform_data()
         return transformed_data
 
-    except requests.exceptions.RequestException as e:
-        return make_response(jsonify({'error': 'Failed to fetch weather data'}), 500)
+    except PositionDataRetrievalError as e:
+        raise 
+    except PositionDataError as e:
+        raise 
+    except WeatherDataRetrievalError as e:
+        raise  
+    except Exception as e:
+        raise PositionDataError("Error processing weather data") from e
+    
+    

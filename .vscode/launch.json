@@ -7,9 +7,9 @@
             "request": "launch",
             "module": "flask",
             "env": {
-                "FLASK_APP": "run.py"  // Replace with your app's entry point
+                "FLASK_APP": "run.py"
             },
-            "args": ["run"]
+            "args": ["run", "--debug"]
         }
     ]
 }
