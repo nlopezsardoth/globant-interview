@@ -27,6 +27,9 @@ docker-compose build
 docker-compose up globant_interview
 ```
 
+### get weather results
+Open `http://127.0.0.1:4000/weather?city=medellin&country=co` in browser or postman
+
 
 #### Run tests
 add `TEST_API_KEY` in  `.env`
