@@ -3,7 +3,7 @@ from app.weather import bp
 
 from .utils.get_weather_data import get_position, get_weather_data
 
-@bp.route('/wheather', methods=["GET"])
+@bp.route('/weather', methods=["GET"])
 def get_weather():
     city = request.args.get("city")
     country = request.args.get("country")
@@ -18,7 +18,7 @@ def get_weather():
         return  make_response(jsonify({'error': 'Invalid country name'}), 400)
 
     try:
-        lat, lon, country, city = get_position("Bogota", "co")
+        lat, lon, country, city = get_position(city, country)
         weather_data = get_weather_data(lat=lat, lon=lon, city_name=city, country=country)
 
         return make_response(jsonify(weather_data))
