@@ -50,12 +50,8 @@ def get_weather_data(city_name, country, api_key):
         transformed_data = transformer.transform_data()
         return transformed_data
 
-    except PositionDataRetrievalError as e:
+    except (PositionDataRetrievalError, PositionDataError, WeatherDataRetrievalError )as e:
         raise 
-    except PositionDataError as e:
-        raise 
-    except WeatherDataRetrievalError as e:
-        raise  
     except Exception as e:
         raise PositionDataError("Error processing weather data") from e
     
