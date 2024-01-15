@@ -31,6 +31,7 @@ docker-compose up globant_interview
 #### get weather results
 Open `http://127.0.0.1:4000/weather?city=medellin&country=co` in browser or postman
 
+or go to ´http://nlopezsardoth.pythonanywhere.com/weather?city=bogota&country=co´ 
 
 
 
