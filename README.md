@@ -27,3 +27,19 @@ docker-compose build
 docker-compose up globant_interview
 ```
 
+
+#### Run tests
+add `TEST_API_KEY` in  `.env`
+
+```shell
+TEST_API_KEY=your-test-api-key 
+```
+from OpenWeather https://openweathermap.org/
+
+test are ubicated in `app/weather/tests` go to that folder and run a test using  `pytest `
+
+```shell
+pytest test_get_weather_data.py
+```
+
+
