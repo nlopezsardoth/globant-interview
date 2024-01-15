@@ -7,6 +7,8 @@ from .errors import build_error_response
 
 from .utils.get_weather_data import get_weather_data
 
+from cache import cache
+
 @bp.route('/weather', methods=["GET"])
 def get_weather():
     API_KEY =  current_app.config["API_KEY"]
@@ -33,4 +35,5 @@ def get_weather():
         current_app.logger.error(f"Unexpected error: {e}")  # Log unexpected errors
         return build_error_response("An unexpected error occurred")
     else:
+        cache.set("weather_data", jsonify(weather_data)) #cache weather data
         return jsonify(weather_data), 200  # Return weather data on success

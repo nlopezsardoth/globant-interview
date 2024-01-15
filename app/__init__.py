@@ -1,5 +1,6 @@
-from flask import Flask, request, jsonify, make_response, render_template
+from flask import Flask
 from config import Config
+from cache import cache
 
 
 def create_app(config_class =Config):
@@ -9,6 +10,8 @@ def create_app(config_class =Config):
     from app.weather import bp as weather
     app.register_blueprint(weather)
 
+    cache.init_app(app)
+    
     @app.route("/", methods=["GET"])
     def index():
         return "<h1> Go to /wheather </h1>"

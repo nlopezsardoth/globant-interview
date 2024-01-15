@@ -4,8 +4,6 @@ from .weather_data_transformer import WeatherDataTransformer
 
 from ..exceptions import PositionDataRetrievalError, WeatherDataRetrievalError, PositionDataError
 
-from ..errors import build_error_response
-
 
 def _fetch_position_data(city_name, country, api_key):
     """Retrieves position data from the API."""
